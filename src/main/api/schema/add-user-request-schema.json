@@ -1,0 +1,37 @@
+{
+	"$schema": "http://json-schema.org/draft-03/schema",
+	"type": "object",
+	"properties": {
+		"userData": {
+			"type": "object",
+			"properties": {
+				"userId": {
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 20,
+					"required": true
+				},
+				"userName": {
+					"type": "string",
+					"required": true
+				},
+				"age": {
+					"type": "number",
+					"required": true
+				},
+				"gender": {
+					"type": "string",
+					"required": true
+				},
+				"englishName": {
+					"type": "string",
+					"required": true
+				},
+				"email": {
+					"type": "string",
+					"required": true
+				}
+			}
+		}
+	}
+}

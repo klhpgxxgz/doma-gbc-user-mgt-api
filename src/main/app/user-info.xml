@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
@@ -9,18 +9,75 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
-    <flow name="getUserInfo">
-        <logger message="#[message.id].flowName" level="INFO" doc:name="Logger"/>
-        <dw:transform-message doc:name="Transform Message">
-            <dw:set-variable variableName="userNum"><![CDATA[%dw 1.0
-%output application/java
----
-payload.userNumber]]></dw:set-variable>
-        </dw:transform-message>
-        <db:select config-ref="MySQL_Configuration" doc:name="MySQL DB">
-            <db:parameterized-query><![CDATA[SELECT * FROM gbc_user_info WHERE USER_NUMBER=#[flowVars.userNum]]]></db:parameterized-query>
+    <flow name="listUsers">
+        <logger message="#[message.id].start" level="INFO" doc:name="Logger"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="List User Info">
+            <db:parameterized-query><![CDATA[SELECT * FROM gbc_user_info WHERE user_status<>'D']]></db:parameterized-query>
         </db:select>
         <json:object-to-json-transformer doc:name="Object to JSON"/>
-        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <logger message="#[message.id].end" level="INFO" doc:name="Logger"/>
+    </flow>    
+    
+    <flow name="addUser">
+        <logger  level="INFO" doc:name="Start Logger"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <flow-ref name="getUser" doc:name="getUser"/>
+        <choice doc:name="Choice">
+            <when expression="#[payload==empty]">
+                <db:insert config-ref="MySQL_Configuration" doc:name="Database">
+                    <db:parameterized-query><![CDATA[INSERT INTO GBC_USER_INFO('USER_ID','USER_NAME','USER_AGE','USER_GENDER','USER_EN_NAME','USER_EMAIL','USER_STATUS') VALUES()]]></db:parameterized-query>
+                </db:insert>
+            </when>
+            <when expression="#[payload.user_status=='D']">
+                <flow-ref name="updateUser" doc:name="updateUser"/>
+            </when>
+            <otherwise>
+                <set-payload doc:name="Set Payload" value="#['insert error.']"/>
+            </otherwise>
+        </choice>
     </flow>
+    <flow name="getUser">
+        <logger message="#[message.id]" level="INFO" doc:name="Logger"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <db:select config-ref="MySQL_Configuration" doc:name="Get User Info">
+            <db:parameterized-query><![CDATA[SELECT * FROM gbc_user_info WHERE USER_ID=#[flowVars.userId]]]></db:parameterized-query>
+        </db:select>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <logger message="#[message.id]" level="INFO" doc:name="Logger"/>
+    </flow>
+    
+    <flow name="updateUser">
+        <logger message="#[message.id]" level="INFO" doc:name="Logger"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="92cfeeae-38b9-4b41-a70f-267ee419fa71">
+            <dw:input-payload mimeType="application/json"/>
+            <dw:set-variable variableName="userVar"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.userData]]></dw:set-variable>
+        </dw:transform-message>
+        <db:select config-ref="MySQL_Configuration" doc:name="Update User Info">
+            <db:parameterized-query><![CDATA[UPDATE gbc_user_info SET 
+USER_NAME='',
+USER_AGE=#[flowVars.userVar.age],
+USER_GENDER=#[flowVars.userVar.gender],
+USER_EN_NAME=#[flowVars.userVar.englishName],
+USER_EMAIL=#[flowVars.userVar.email],
+USER_STATUS='A'
+WHERE USER_ID=#[flowVars.userVar.userId]]]></db:parameterized-query>
+        </db:select>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <logger message="#[message.id]" level="INFO" doc:name="Logger"/>
+    </flow>    
 </mule>

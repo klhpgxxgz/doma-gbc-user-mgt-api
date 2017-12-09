@@ -1,0 +1,20 @@
+{
+	"userData": [{
+			"userId": "44084800",
+			"userName": "MingLi",
+			"age": 15,
+			"gender": "M",
+			"englishName": "Arno",
+			"email": "Arno@123.com",
+		}, {
+			"userId": "44084801",
+			"userName": "XiaoWang",
+			"age": 20,
+			"gender": "W",
+			"englishName": "Anne",
+			"email": "Anne@123.com",
+		}
+	],
+	"responseCode":"200",
+	"message":"success"
+}

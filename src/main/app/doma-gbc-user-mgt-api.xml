@@ -1,18 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd">
-
-    <apikit:config xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" name="doma-gbc-user-mgt-api-config" raml="doma-gbc-user-mgt-api.raml" consoleEnabled="true" doc:name="Router" keepRamlBaseUri="false"/>
+    <apikit:config name="doma-gbc-user-mgt-api-config" raml="doma-gbc-user-mgt-api.raml" consoleEnabled="true" doc:name="Router" keepRamlBaseUri="false" />
     <flow name="doma-gbc-user-mgt-api-main">
-        <http:listener xmlns:http="http://www.mulesoft.org/schema/mule/http" config-ref="process_api_http" path="/api/*" doc:name="HTTP"/>
-        <apikit:router xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" config-ref="doma-gbc-user-mgt-api-config" doc:name="APIkit Router"/>
-        <exception-strategy ref="doma-gbc-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
+        <http:listener config-ref="process_api_http" path="/api/*" doc:name="HTTP" />
+        <apikit:router config-ref="doma-gbc-user-mgt-api-config" doc:name="APIkit Router" />
+        <exception-strategy ref="doma-gbc-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy" />
     </flow>
 
-    <flow name="post:/user/login:doma-gbc-user-mgt-api-config">
-        <flow-ref name="getUserInfo" doc:name="getUserInfo"/>
+    <flow name="put:/user/update:doma-gbc-user-mgt-api-config">
+        <flow-ref name="updateUser" doc:name="updateUser"/>
+
+    </flow>
+    <flow name="delete:/user/delete:doma-gbc-user-mgt-api-config">
+        <set-payload value="{&#xD;&#xA;&#x9;&quot;responseCode&quot; : &quot;200&quot;,&#xD;&#xA;&#x9;&quot;message&quot; :&quot;success&quot;&#xD;&#xA;}" doc:name="Set Payload"/>
+    </flow>
+    <flow name="post:/users:doma-gbc-user-mgt-api-config">
+        <flow-ref name="listUsers" doc:name="listUsers"/>
+
+    </flow>
+    <flow name="post:/user/add:doma-gbc-user-mgt-api-config">
+        <flow-ref name="addUser" doc:name="addUser"/>
+
+    </flow>
+    <flow name="post:/user/get:doma-gbc-user-mgt-api-config">
+        <flow-ref name="getUser" doc:name="getUser"/>
 
     </flow>
 </mule>

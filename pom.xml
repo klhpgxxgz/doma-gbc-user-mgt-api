@@ -144,7 +144,7 @@
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-            <groupId>com.doms.gbc</groupId>
+            <groupId>com.doma.gbc</groupId>
             <artifactId>api-domain</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>
@@ -159,6 +159,18 @@
     <dependency>
             <groupId>org.mule.modules</groupId>
             <artifactId>mule-module-spring-config</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-db</artifactId>
+            <version>${mule.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    <dependency>
+            <groupId>com.mulesoft.weave</groupId>
+            <artifactId>mule-plugin-weave</artifactId>
             <version>${mule.version}</version>
             <scope>provided</scope>
         </dependency>
